@@ -67,8 +67,8 @@ export function Upload() {
       </CardContent>
 
       <CardContent className="p-6">
-        <p className="text-sm mt-4 leading-none text-gray-500 dark:text-gray-400">
-          {!!unique.length && `Use the code to access the documents: ${unique.join(" ")}`}
+        <p className="text-sm mt-4 text-center leading-none text-gray-500 dark:text-gray-400">
+          {!!unique.length && <div>Use these 3 magical words to access the uploaded documents<div className=' text-xl text-gray-700 dark:text-gray-200'> {unique.join(" ")} </div></div>}
         </p>
       </CardContent>
 
