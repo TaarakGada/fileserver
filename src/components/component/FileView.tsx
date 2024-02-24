@@ -121,11 +121,32 @@ export function FileView() {
           <CardContent>
             {fileLinks.map(link => (<div key={link} className="flex items-center mt-4 space-x-2">
               <Download className="w-4 h-4" />
-              <Link target={"_blank"} href={`https://sujal.pockethost.io/api/files/files/${collectionID}/${link}`}>{link ? link.split("_")[0] + (link.includes(".") ? "." + link.split(".")[1] : "") : ""}</Link>
+              <a target="_blank" href={`https://sujal.pockethost.io/api/files/files/${collectionID}/${link}`} download>{link ? link.split("_")[0] + (link.includes(".") ? "." + link.split(".")[1] : "") : ""}</a>
             </div>))}
           </CardContent>
         </Card>
       }
+
+      {/* Instructions for users */}
+    <Card className="w-full max-w-lg my-8">
+      <CardHeader>
+        <CardTitle>Instructions</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          To fetch your uploaded files, follow these steps:
+        </p>
+        <ol className="list-decimal list-inside mt-2">
+          <li>Enter three words in the input fields above.</li>
+          <li>Click the "Fetch Files" button.</li>
+          <li>If the words match, the uploaded files will be displayed below.</li>
+          <li>Click on the file links to download them.</li>
+        </ol>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
+          If you want to upload files instead, you can click the "Upload Files Instead" link.
+        </p>
+      </CardContent>
+    </Card>
     </>
   )
 }
