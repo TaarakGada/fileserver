@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 export default function Home() {
     return (
 
-        <main className="flex flex-col items-center justify-center m-4">
+        <main className="flex flex-col items-center justify-between">
             <FileView />
         </main>
     );

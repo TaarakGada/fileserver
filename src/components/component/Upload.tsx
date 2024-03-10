@@ -72,8 +72,8 @@ export function Upload() {
   };
 
   return (
-    <Card key="1" className="w-full h-full max-w-3xl flex flex-col items-center justify-between my-[30lvh]">
-      <CardContent className="p-6">
+    <Card key="1" className=" w-auto h-5/6 max-w-3xl flex flex-col items-center justify-center my-auto">
+      <CardContent className="p-4 m-auto">
         <div className="flex items-center gap-4">
           <div className="flex flex-col items-center">
             <h1 className="text-5xl font-bold leading-none">File Server</h1>
@@ -84,8 +84,8 @@ export function Upload() {
         </div>
       </CardContent>
 
-      <CardContent className="p-6">
-        <p className="text-sm mt-4 text-center leading-none text-gray-500 dark:text-gray-400">
+      <CardContent className="px-4 py-0">
+        <p className="text-sm text-center leading-none text-gray-500 dark:text-gray-400">
           {!!unique.length && (
             <div>
               Use these 3 magical words to access the uploaded documents
@@ -97,13 +97,13 @@ export function Upload() {
         </p>
       </CardContent>
 
-      <CardContent className="p-4 flex flex-col items-center">
+      <CardContent className="p-4 m-auto flex flex-col items-center">
         <Input
           type="file"
           id="fileInput"
           multiple
           onChange={handleFileChange}
-          className="mb-4"
+          className="mb-4 file:text-white bg-background-black"
         />
         <Button onClick={handleUpload} variant={"default"} className="w-full">
           Upload
@@ -111,13 +111,13 @@ export function Upload() {
 
         <div className='w-full border m-4 border-gray-200' />
 
-        <p className="text-sm mt-4 mb-4 space-y-2 leading-none text-gray-500 dark:text-gray-400">
+        <p className="text-sm mt-4 mb-4 space-y-2 leading-none  text-gray-500 dark:text-gray-400">
           Instructions for Use:
-          <ul className="list-disc space-y-1 list-inside">
-            <li>Click the "Choose File" button to select one or more files for upload.</li>
-            <li>Click the "Upload" button to upload the selected files to the temporary file server.</li>
-            <li>After uploading, you will be provided with 3 magical words to access your documents.</li>
-            <li>Use these words to retrieve your documents later.</li>
+          <ul className="list-disc space-y-1 list-inside my-2">
+            <li className='p-0. text-sm'>Click the "Choose File" button to select one or more files for upload.</li>
+            <li className='p-0. text-sm'>Click the "Upload" button to upload the selected files to the temporary file server.</li>
+            <li className='p-0. text-sm'>After uploading, you will be provided with 3 magical words to access your documents.</li>
+            <li className='p-0. text-sm'>Use these words to retrieve your documents later.</li>
           </ul>
         </p>
 

@@ -75,7 +75,7 @@ export function FileView() {
 
   return (
     <>
-      <Card className="w-full max-w-lg my-20">
+      <Card className="w-full max-w-lg m-8">
         <CardHeader>
           <CardTitle>Enter the 3 magical Words</CardTitle>
           <CardDescription>Enter the words to fetch the uploaded files.</CardDescription>
@@ -128,7 +128,7 @@ export function FileView() {
       }
 
       {/* Instructions for users */}
-    <Card className="w-full max-w-lg my-8">
+    <Card className="w-full max-w-lg m-8">
       <CardHeader>
         <CardTitle>Instructions</CardTitle>
       </CardHeader>
