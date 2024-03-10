@@ -114,10 +114,10 @@ export function Upload() {
         <p className="text-sm mt-4 mb-4 space-y-2 leading-none  text-gray-500 dark:text-gray-400">
           Instructions for Use:
           <ul className="list-disc space-y-1 list-inside my-2">
-            <li className='p-0. text-sm'>Click the "Choose File" button to select one or more files for upload.</li>
-            <li className='p-0. text-sm'>Click the "Upload" button to upload the selected files to the temporary file server.</li>
-            <li className='p-0. text-sm'>After uploading, you will be provided with 3 magical words to access your documents.</li>
-            <li className='p-0. text-sm'>Use these words to retrieve your documents later.</li>
+            <li className='text-sm'>Click the "Choose File" button to select one or more files for upload.</li>
+            <li className='text-sm'>Click the "Upload" button to upload the selected files to the temporary file server.</li>
+            <li className='text-sm'>After uploading, you will be provided with 3 magical words to access your documents.</li>
+            <li className='text-sm'>Use these words to retrieve your documents later.</li>
           </ul>
         </p>
 
