@@ -313,7 +313,7 @@ export function Upload() {
                                         <div className="w-1/12 flex justify-center items-center mx-1 ">
                                             <FileIcon className="w-4 h-4 " />
                                         </div>
-                                        <div className="w-11/12 flex flex-wrap mx-1">
+                                        <div className="w-11/12 flex flex-nowrap overflow-hidden text-ellipsis mx-1">
                                             {file.name}
                                         </div>
                                     </div>
