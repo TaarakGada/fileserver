@@ -197,8 +197,8 @@ export function FileView() {
 
             {showInstructions && (
                 <div className="fixed top-0 left-0 w-full h-full z-5 flex justify-center items-center">
-                    <div className="instructions-overlay bg-black p-4 rounded-lg border border-solid border-white/50 text-card-foreground shadow-sm">
-                        <div className="flex justify-between items-center w-full">
+                    <div className="instructions-overlay bg-black p-4 rounded-lg border border-solid border-white/50 text-card-foreground shadow-sm m-2">
+                        <div className="flex justify-between items-center w-full mb-1">
                             <h1 className=" font-semibold text-gray-200 text-lg">
                                 Instructions
                             </h1>

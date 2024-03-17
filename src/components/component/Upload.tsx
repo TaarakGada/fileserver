@@ -205,7 +205,7 @@ export function Upload() {
             </div>
             <Card
                 key="1"
-                className=" h-auto w-6/12 max-w-96 flex flex-col items-center justify-center m-auto"
+                className=" h-auto w-11/12 max-w-96 flex flex-col items-center justify-center m-auto"
             >
                 <CardContent className="p-4 m-auto">
                     <div className="flex items-center gap-4">
@@ -303,22 +303,28 @@ export function Upload() {
 
                 {selectedFiles.length > 0 && (
                     <div className="m-2 w-full">
-                        <ul>
+                        <ul className="p-2">
                             {selectedFiles.map((file, index) => (
                                 <li
                                     key={index}
-                                    className="flex items-center justify-between mx-2 p-1 rounded-sm my-1"
+                                    className="flex items-center justify-between p-2 my-2 h-auto w-full"
                                 >
-                                    <div className="flex items-center justify-between">
-                                        <FileIcon className="w-4 h-4 m-2" />
-                                        {file.name}
+                                    <div className="flex items-center w-11/12">
+                                        <div className="w-1/12 flex justify-center items-center mx-1 ">
+                                            <FileIcon className="w-4 h-4 " />
+                                        </div>
+                                        <div className="w-11/12 flex flex-wrap mx-1">
+                                            {file.name}
+                                        </div>
                                     </div>
-                                    <Button
-                                        onClick={() => deleteFile(index)}
-                                        className="h-6 w-6 p-1 bg-transparent text-gray-500 border border-gray-500"
-                                    >
-                                        X
-                                    </Button>
+                                    <div className="w-1/12 flex items-center justify-center">
+                                        <Button
+                                            onClick={() => deleteFile(index)}
+                                            className="h-6 w-6 p-1 bg-transparent text-gray-500 border border-gray-500"
+                                        >
+                                            X
+                                        </Button>
+                                    </div>
                                 </li>
                             ))}
                         </ul>
@@ -328,8 +334,8 @@ export function Upload() {
 
             {showInstructions && (
                 <div className="fixed top-0 left-0 w-full h-full z-50 flex justify-center items-center">
-                    <div className="instructions-overlay bg-black p-4 rounded-lg border border-solid border-white/50 text-card-foreground shadow-sm">
-                        <div className="flex justify-between items-center w-full">
+                    <div className="instructions-overlay bg-black p-4 rounded-lg border border-solid border-white/50 text-card-foreground shadow-sm m-2">
+                        <div className="flex justify-between items-center w-full mb-1">
                             <h1 className=" font-semibold text-gray-200 text-lg">
                                 Instructions
                             </h1>
