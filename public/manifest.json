@@ -1,0 +1,48 @@
+{
+    "theme_color": "#299752",
+    "background_color": "#1a1817",
+    "display": "standalone",
+    "scope": "/",
+    "start_url": "/",
+    "name": "File Server",
+    "short_name": "FS",
+    "description": "Share files",
+    "file_handlers": [
+        {
+            "action": "/",
+            "accept": {
+                "*/*": [
+                    "."
+                ]
+            }
+        }
+    ],
+    "icons": [
+        {
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icons/icon-256x256.png",
+            "sizes": "256x256",
+            "type": "image/png"
+        },
+        {
+            "src": "/icons/icon-384x384.png",
+            "sizes": "384x384",
+            "type": "image/png"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/icons/maskable.png",
+            "sizes": "192x192",
+            "type": "image/x-icon",
+            "purpose": "maskable"
+        }
+    ]
+}

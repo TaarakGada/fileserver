@@ -17,7 +17,7 @@ export function FileView() {
     const pb = new PocketBase('https://sujal.pockethost.io');
     const [showInstructions, setShowInstructions] = useState(false);
     const [fileLinks, setFilelinks] = useState<string[]>([]);
-    const [magicWords, setMagicWords] = useState<string[]>([]);
+    const [magicWords, setMagicWords] = useState<string>("");
     const [collectionID, setCollectionId] = useState<string>('');
     const [loading, setLoading] = useState(false);
 
@@ -27,23 +27,14 @@ export function FileView() {
                 toast.error('No word entered.');
                 return;
             }
-            magicWords.forEach((word) => {
-                if (word.length <= 0) {
-                    toast.error('Please enter all the words');
-                    return;
-                }
-            });
+
 
             setLoading(true);
             toast.success('Fetching files...');
             const res = await pb
                 .collection('files')
                 .getFirstListItem(
-                    `unique = "${magicWords[0]
-                        .trim()
-                        .toLowerCase()} ${magicWords[1]
-                        .trim()
-                        .toLowerCase()} ${magicWords[2].trim().toLowerCase()}"`,
+                    `unique = "${magicWords.trim().toLowerCase()}"`,
                     {}
                 );
 
@@ -54,40 +45,22 @@ export function FileView() {
             toast.error('Error fetching files. Please try again.');
         } finally {
             setLoading(false);
-            setMagicWords((current) => []);
+            setMagicWords((current) => "");
             // also clear any value in word inputs
             const word1Input = document.getElementById(
                 'word1'
             ) as HTMLInputElement;
-            const word2Input = document.getElementById(
-                'word2'
-            ) as HTMLInputElement;
-            const word3Input = document.getElementById(
-                'word3'
-            ) as HTMLInputElement;
 
-            if (word1Input && word2Input && word3Input) {
+            if (word1Input) {
                 word1Input.value = '';
-                word2Input.value = '';
-                word3Input.value = '';
             }
         }
     };
 
-    const handleInputChange = (index: number, value: string) => {
+    const handleInputChange = (value: string) => {
         setMagicWords((current) => {
-            const updatedWords = [...current];
-            updatedWords[index] = value;
-            return updatedWords;
+            return value;
         });
-
-        // Move focus to the next input field if not the last input
-        if (index < 2 && value.endsWith(' ')) {
-            const nextInput = document.getElementById(`word${index + 2}`);
-            nextInput?.focus();
-        } else if (index == 2 && value.endsWith(' ')) {
-            return fetchFiles();
-        }
     };
 
     const toggleInstructions = () => {
@@ -110,9 +83,9 @@ export function FileView() {
             </div>
             <Card className="w-auto max-w-lg m-4">
                 <CardHeader>
-                    <CardTitle>Enter the 3 magical Words</CardTitle>
+                    <CardTitle>Enter the Shared Code</CardTitle>
                     <CardDescription>
-                        Enter the words to fetch the uploaded files.
+                        Confused? Try uploading a file before receiving the code
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="flex gap-4">
@@ -120,37 +93,11 @@ export function FileView() {
                         <Input
                             onChange={(
                                 e: React.ChangeEvent<HTMLInputElement>
-                            ) => handleInputChange(0, e.target.value)}
-                            id="word1"
-                            placeholder="moon"
-                            type="text"
-                            className="border border-gray-500"
-                        />
-                    </div>
-                    <div className="grid w-full">
-                        <Input
-                            onChange={(
-                                e: React.ChangeEvent<HTMLInputElement>
-                            ) => handleInputChange(1, e.target.value)}
-                            id="word2"
-                            placeholder="life"
-                            type="text"
-                            className="border border-gray-500"
-                        />
-                    </div>
-                    <div className="grid w-full">
-                        <Input
-                            onChange={(
-                                e: React.ChangeEvent<HTMLInputElement>
                             ) => {
-                                setMagicWords((current) => [
-                                    current[0],
-                                    current[1],
-                                    e.target.value,
-                                ]);
+                                setMagicWords((current) => e.target.value);
                             }}
                             id="word3"
-                            placeholder="nature"
+                            placeholder="xx00"
                             type="text"
                             className="border border-gray-500"
                         />
@@ -184,9 +131,9 @@ export function FileView() {
                                 >
                                     {link
                                         ? link.split('_')[0] +
-                                          (link.includes('.')
-                                              ? '.' + link.split('.')[1]
-                                              : '')
+                                        (link.includes('.')
+                                            ? '.' + link.split('.')[1]
+                                            : '')
                                         : ''}
                                 </a>
                             </div>
