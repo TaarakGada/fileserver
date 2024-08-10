@@ -1,6 +1,8 @@
 // app/api/share/route.js (for Next.js App Router)
 // or pages/api/share.js (for Next.js Pages Router)
 
+
+import { redirect } from 'next/navigation';
 import { NextRequest } from 'next/server';
 import PocketBase from 'pocketbase';
 
@@ -16,10 +18,10 @@ export async function POST(req: NextRequest) {
 
         if (file) {
             const pbFormData = new FormData();
-            pbFormData.append('file', file);
-            if (title) pbFormData.append('title', title);
-            if (text) pbFormData.append('text', text);
-            if (url) pbFormData.append('url', url);
+            // pbFormData.append('file', file);
+            // if (title) pbFormData.append('title', title);
+            // if (text) pbFormData.append('text', text);
+            // if (url) pbFormData.append('url', url);
 
             let unique;
             do {
@@ -30,14 +32,16 @@ export async function POST(req: NextRequest) {
 
             await pb.collection('files').create(pbFormData);
 
-            return new Response(JSON.stringify({ success: true, unique }), { status: 200 });
+            return redirect(`/${unique}`);
         } else {
-            return new Response(JSON.stringify({ error: 'No file received' }), { status: 400 });
+            return redirect(`/`);
         }
     } catch (error: any) {
         console.error('Error handling shared content:', error?.message);
-        return new Response(JSON.stringify({ error: 'Failed to process shared content' }), { status: 500 });
+        return redirect(`/`);
     }
+
+
 }
 
 function generateUniqueCode() {
