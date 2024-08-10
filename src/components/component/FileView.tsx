@@ -8,80 +8,60 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Download, FileIcon } from 'lucide-react';
-import { useState } from 'react';
+import { Download } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import PocketBase from 'pocketbase';
 import toast from 'react-hot-toast';
 
-export function FileView() {
+interface FileViewProps {
+    code?: string;
+}
+
+export function FileView({ code = '' }: FileViewProps) {
     const pb = new PocketBase('https://sujal.pockethost.io');
-    const [showInstructions, setShowInstructions] = useState(false);
-    const [fileLinks, setFilelinks] = useState<string[]>([]);
-    const [magicWords, setMagicWords] = useState<string>("");
+    const [fileLinks, setFileLinks] = useState<string[]>([]);
+    const [magicWord, setMagicWord] = useState<string>(code.length == 4 ? code : '');
     const [collectionID, setCollectionId] = useState<string>('');
     const [loading, setLoading] = useState(false);
+    const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
 
-    const fetchFiles = async () => {
+    useEffect(() => {
+        if (code && code.length === 4 && !hasAttemptedFetch) {
+            fetchFiles(code);
+        }
+    }, [code, hasAttemptedFetch]);
+
+    const fetchFiles = async (uniqueId: string) => {
+        setHasAttemptedFetch(true);
+        setLoading(true);
         try {
-            if (magicWords.length <= 0) {
-                toast.error('No word entered.');
-                return;
-            }
-
-
-            setLoading(true);
             toast.success('Fetching files...');
             const res = await pb
                 .collection('files')
-                .getFirstListItem(
-                    `unique = "${magicWords.trim().toLowerCase()}"`,
-                    {}
-                );
+                .getFirstListItem(`unique = "${uniqueId.trim().toLowerCase()}"`, {});
 
-            setFilelinks(res.file);
+            setFileLinks(res.file);
             setCollectionId(res.id);
-        } catch (error) {
-            console.error('Error fetching files:', error);
-            toast.error('Error fetching files. Please try again.');
+        } catch (error: any) {
+            if (!error.toString().includes("ClientResponseError")) {
+                toast.error("Error: " + error?.toString());
+            }
         } finally {
             setLoading(false);
-            setMagicWords((current) => "");
-            // also clear any value in word inputs
-            const word1Input = document.getElementById(
-                'word1'
-            ) as HTMLInputElement;
-
-            if (word1Input) {
-                word1Input.value = '';
-            }
         }
     };
 
-    const handleInputChange = (value: string) => {
-        setMagicWords((current) => {
-            return value;
-        });
-    };
-
-    const toggleInstructions = () => {
-        setShowInstructions(!showInstructions);
+    const handleFetchFiles = () => {
+        if (magicWord.length <= 0) {
+            toast.error('No word entered.');
+            return;
+        }
+        fetchFiles(magicWord);
     };
 
     return (
         <>
-            <div className="flex justify-end items-center w-full fixed top-0">
-                {!showInstructions && (
-                    <>
-                        <Button
-                            onClick={toggleInstructions}
-                            className="m-2"
-                        >
-                            ?
-                        </Button>
-                    </>
-                )}
-            </div>
-            <Card className="w-auto max-w-lg m-4">
+            <Card className="h-auto w-11/12 max-w-96 flex flex-col items-center justify-center">
                 <CardHeader>
                     <CardTitle>Enter the Shared Code</CardTitle>
                     <CardDescription>
@@ -91,10 +71,9 @@ export function FileView() {
                 <CardContent className="flex gap-4">
                     <div className="grid w-full">
                         <Input
-                            onChange={(
-                                e: React.ChangeEvent<HTMLInputElement>
-                            ) => {
-                                setMagicWords((current) => e.target.value);
+                            value={magicWord}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                setMagicWord(e.target.value);
                             }}
                             id="word3"
                             placeholder="xx00"
@@ -106,7 +85,7 @@ export function FileView() {
                 <CardContent className="flex items-center flex-col justify-center mt-4 gap-1">
                     <Button
                         className="w-full text-md"
-                        onClick={fetchFiles}
+                        onClick={handleFetchFiles}
                     >
                         {loading ? 'Loading...' : 'Fetch Files'}
                     </Button>
@@ -140,37 +119,6 @@ export function FileView() {
                         ))}
                     </CardContent>
                 </Card>
-            )}
-
-            {showInstructions && (
-                <div className="fixed top-0 left-0 w-full h-full z-5 flex justify-center items-center">
-                    <div className="instructions-overlay bg-black p-4 rounded-lg border border-solid border-white/50 text-card-foreground shadow-sm m-2">
-                        <div className="flex justify-between items-center w-full mb-1">
-                            <h1 className=" font-semibold text-gray-200 text-lg">
-                                Instructions
-                            </h1>
-                            <Button onClick={toggleInstructions}>X</Button>
-                        </div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                            To fetch your uploaded files, follow these steps:
-                        </p>
-                        <ol className="list-decimal list-inside mt-2 text-gray-400">
-                            <li>
-                                Enter three words in the input fields above.
-                            </li>
-                            <li>Click the "Fetch Files" button.</li>
-                            <li>
-                                If the words match, the uploaded files will be
-                                displayed below.
-                            </li>
-                            <li>Click on the file links to download them.</li>
-                        </ol>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
-                            If you want to upload files instead, you can click
-                            the "Upload Files Instead" link.
-                        </p>
-                    </div>
-                </div>
             )}
         </>
     );

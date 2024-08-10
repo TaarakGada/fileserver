@@ -10,33 +10,12 @@ import QRCode from './qrCode';
 import clsx from 'clsx';
 
 export function Upload() {
-    const [showInstructions, setShowInstructions] = useState(false);
+    
     const [loading, setLoading] = useState(false);
     const [unique, setUnique] = useState<string>();
     const pb = new PocketBase('https://sujal.pockethost.io');
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
-    const [showInstallPrompt, setShowInstallPrompt] = useState(false);
-    const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-
-    useEffect(() => {
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            setDeferredPrompt(e);
-            setShowInstallPrompt(true);
-        });
-    }, []);
-
-    const handleInstall = async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                setShowInstallPrompt(false);
-            }
-            setDeferredPrompt(null);
-        }
-    };
 
     useEffect(() => {
         if (isPWA() && 'launchQueue' in window) {
@@ -104,21 +83,9 @@ export function Upload() {
 
     return (
         <>
-            <div className="flex justify-end items-center w-full fixed top-0">
-                {!showInstructions && (
-                    <>
-                        {showInstallPrompt && (
-                            <Button onClick={handleInstall} className="m-2">
-                                Install App
-                            </Button>
-                        )}
-                        <Button onClick={() => setShowInstructions(true)} className="m-2">?</Button>
-                    </>
-                )}
-            </div>
-            <Card className={clsx("h-auto w-11/12 max-w-96 flex flex-col items-center justify-center m-auto", showInstructions ? "blur-sm" : "")}>
+            <Card className={"h-auto w-11/12 max-w-96 flex flex-col items-center justify-center m-auto"}>
                 <CardContent className="p-4 m-auto text-center">
-                    <h1 className="text-4xl font-bold">File Server</h1>
+                    <h1 className="text-4xl font-bold">File Share</h1>
                     <p className="text-sm mt-4 text-gray-500 dark:text-gray-400">Temporary File Server</p>
                 </CardContent>
 
@@ -132,7 +99,7 @@ export function Upload() {
                             <div className="text-xl text-gray-700 dark:text-gray-200 font-mono">
                                 Sharing Code <span className='text-primary'>{unique}</span>
                             </div>
-                            <QRCode url={`https://fs.sujal.xyz/get/${unique}`} />
+                            <QRCode url={`https://fs.sujal.xyz/${unique}`} />
                         </div>
                     ) : null}
                 </CardContent>
@@ -142,7 +109,7 @@ export function Upload() {
                         {selectedFiles.length > 0 ? `${selectedFiles.length} file(s) selected` : 'Select Files'}
                         <input type="file" id="fileInput" multiple onChange={handleFileChange} className="hidden" />
                     </label>
-                    <Button onClick={() => handleUpload()} variant='default' className="w-full my-2 text-md">Upload</Button>
+                    <Button onClick={() => handleUpload()} variant='default' disabled={loading} className="w-full my-2 text-md">Upload</Button>
                     <Link href='/get' className="w-full m-2">
                         <Button variant='outline' className="w-full border border-gray-500 text-md">Get</Button>
                     </Link>
@@ -164,23 +131,6 @@ export function Upload() {
                     </div>
                 )}
             </Card>
-
-            {showInstructions && (
-                <div className="fixed top-0 left-0 w-full h-full z-50 flex justify-center items-center bg-black bg-opacity-50">
-                    <div className="instructions-overlay bg-black p-4 rounded-lg border border-solid border-white/50 text-card-foreground shadow-sm m-2">
-                        <div className="flex justify-between items-center w-full mb-1">
-                            <h1 className="font-semibold text-gray-200 text-lg">Instructions</h1>
-                            <Button onClick={() => setShowInstructions(false)}>X</Button>
-                        </div>
-                        <ul className="list-disc space-y-1 list-inside my-2 text-sm text-gray-500 dark:text-gray-400">
-                            <li>Click the "Choose File" button to select one or more files for upload.</li>
-                            <li>Click the "Upload" button to upload the selected files to the temporary file server.</li>
-                            <li>After uploading, you will be provided with 3 magical words to access your documents.</li>
-                            <li>Use these words to retrieve your documents later.</li>
-                        </ul>
-                    </div>
-                </div>
-            )}
         </>
     );
 }

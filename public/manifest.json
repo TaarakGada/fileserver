@@ -4,17 +4,34 @@
     "display": "standalone",
     "scope": "/",
     "start_url": "/",
-    "name": "File Server",
+    "name": "File Share",
     "short_name": "FS",
     "description": "Share files",
     "file_handlers": [
         {
             "action": "/",
-            "accept": {
-                "*/*": [
-                    "."
-                ]
-            }
+            "file_handlers": [
+                {
+                    "action": "/",
+                    "accept": {
+                        "application/*": [
+                            "."
+                        ],
+                        "audio/*": [
+                            "."
+                        ],
+                        "image/*": [
+                            "."
+                        ],
+                        "text/*": [
+                            "."
+                        ],
+                        "video/*": [
+                            "."
+                        ]
+                    }
+                }
+            ]
         }
     ],
     "icons": [

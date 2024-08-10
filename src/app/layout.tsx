@@ -7,8 +7,8 @@ import Head from 'next/head';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-    title: 'File Server',
-    description: 'Temp File Server',
+    title: 'File Share',
+    description: 'Temp File Share',
     manifest: '/manifest.json',
 };
 
@@ -17,16 +17,17 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    
     return (
         <html lang="en">
             <body className={`dark h-screen ${inter.className || ''}`}>
                 <Head>
                     <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover' />
-                    <meta name="File Server" content="File Server" />
+                    <meta name="File Share" content="File Share" />
                     <meta name="apple-mobile-web-app-capable" content="yes" />
                     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
                     <meta name="apple-mobile-web-app-title" content="yes" />
-                    <meta name="description" content="File server" />
+                    <meta name="description" content="File Share" />
                     <meta name="format-detection" content="telephone=no" />
                     <meta name="mobile-web-app-capable" content="yes" />
                     <meta name="msapplication-TileColor" content="#2B5797" />
