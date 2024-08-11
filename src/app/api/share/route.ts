@@ -1,4 +1,5 @@
-import { redirect } from 'next/navigation';
+// app/api/share/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import PocketBase from 'pocketbase';
 
@@ -10,25 +11,20 @@ function generateUniqueCode() {
 }
 
 export async function POST(req: NextRequest) {
+    let newUnique = '';
     try {
         const formData = await req.formData();
         const pb = new PocketBase('https://sujal.pockethost.io');
 
-        let newUnique;
         do {
             newUnique = generateUniqueCode();
         } while (await pb.collection('files').getFirstListItem(`unique="${newUnique}"`).catch(() => null));
 
         formData.append('unique', newUnique);
         await pb.collection('files').create(formData);
-
-        // Redirect to the show-code URL on success
-        return redirect("https://fs.sujal.xyz/show-" + newUnique);
-
+        return NextResponse.redirect(`https://fs.sujal.xyz/show-${newUnique}`, { status: 303 });
     } catch (error: any) {
         console.error('Error handling shared content:', error?.message);
-
-        // Redirect to home on failure
-        return redirect('https://fs.sujal.xyz/');
+        return NextResponse.json({ error: 'Failed to process the request' }, { status: 500 });
     }
 }
