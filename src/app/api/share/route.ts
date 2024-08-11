@@ -1,6 +1,6 @@
 // app/api/share/route.ts
-
-import { NextRequest, NextResponse } from 'next/server';
+import { redirect } from 'next/navigation';
+import { NextRequest } from 'next/server';
 import PocketBase from 'pocketbase';
 
 function generateUniqueCode() {
@@ -26,11 +26,13 @@ export async function POST(req: NextRequest) {
 
     } catch (error: any) {
         console.error('Error handling shared content:', error?.message);
-
-        // Redirect to home on failure
+        newUnique = "";
         return redirect('https://fs.sujal.xyz/');
     } finally {
-        // Redirect to the show-code URL on success
-        return redirect("https://fs.sujal.xyz/show-" + newUnique);
+        if (newUnique === "") {
+            return redirect('https://fs.sujal.xyz/');
+        } else {
+            return redirect('https://fs.sujal.xyz/show-' + newUnique);
+        }
     }
 }
