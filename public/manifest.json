@@ -85,5 +85,33 @@
             "type": "image/x-icon",
             "purpose": "maskable"
         }
+    ],
+    "shortcuts": [
+        {
+            "name": "Upload Files",
+            "short_name": "Upload",
+            "description": "Go to the upload page",
+            "url": "/",
+            "icons": [
+                {
+                    "src": "/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Download Files",
+            "short_name": "Download",
+            "description": "Go to the download page",
+            "url": "/get",
+            "icons": [
+                {
+                    "src": "/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        }
     ]
 }
