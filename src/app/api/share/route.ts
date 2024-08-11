@@ -15,20 +15,23 @@ function generateUniqueCode() {
 
 
 export async function POST(req: NextRequest) {
+    let newUnique = '';
     try {
         const formData = await req.formData();
         const pb = new PocketBase('https://sujal.pockethost.io');
 
-        let newUnique;
         do {
             newUnique = generateUniqueCode();
         } while (await pb.collection('files').getFirstListItem(`unique="${newUnique}"`).catch(() => null));
+
         formData.append('unique', newUnique);
         await pb.collection('files').create(formData);
-        return redirect("https://fs.sujal.xyz/show-" + newUnique);
 
     } catch (error: any) {
         console.error('Error handling shared content:', error?.message);
         return redirect('https://fs.sujal.xyz/');
+    } finally {
+        // Ensure that the redirect happens after all the above operations
+        return redirect("https://fs.sujal.xyz/show-" + newUnique);
     }
 }
