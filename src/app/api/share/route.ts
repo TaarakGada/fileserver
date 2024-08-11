@@ -2,7 +2,6 @@
 // or pages/api/share.js (for Next.js Pages Router)
 
 
-import { redirect } from 'next/navigation';
 import { NextRequest, NextResponse } from 'next/server';
 import PocketBase from 'pocketbase';
 
@@ -26,10 +25,10 @@ export async function POST(req: NextRequest) {
         } while (await pb.collection('files').getFirstListItem(`unique="${newUnique}"`).catch(() => null));
         formData.append('unique', newUnique);
         await pb.collection('files').create(formData);
-        return NextResponse.redirect("/show-" + newUnique);
+        return NextResponse.redirect("https://fs.sujal.xyz/show-" + newUnique);
 
     } catch (error: any) {
         console.error('Error handling shared content:', error?.message);
-        return NextResponse.redirect('/');
+        return NextResponse.redirect('https://fs.sujal.xyz/');
     }
 }
