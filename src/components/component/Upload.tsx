@@ -1,13 +1,101 @@
 'use client';
-import React, { useState, ChangeEvent, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { CardContent, Card } from '@/components/ui/card';
-import PocketBase from 'pocketbase';
+import { Card, CardContent } from '@/components/ui/card';
+import { DownloadCloudIcon, Sliders, UploadCloudIcon, X } from 'lucide-react';
 import Link from 'next/link';
+import PocketBase from 'pocketbase';
+import { ChangeEvent, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { FileIcon } from 'lucide-react';
 import QRCode from './qrCode';
-import clsx from 'clsx';
+
+import {
+    FileArchive,
+    FileAudio,
+    FileCode,
+    FileIcon,
+    FileSearch,
+    FileSpreadsheet,
+    FileText,
+    FileVideo,
+    Image,
+} from 'lucide-react';
+
+const getIconForFileType = (name: string) => {
+    const fileExt = name.split('.').pop()?.toLowerCase();
+    switch (fileExt) {
+        case 'pdf':
+            return <FileIcon className="h-6 w-6 mr-2" />;
+        case 'doc':
+        case 'docx':
+            return <FileText className="h-6 w-6 mr-2" />;
+        case 'xls':
+        case 'xlsx':
+        case 'csv':
+            return <FileSpreadsheet className="h-6 w-6 mr-2" />;
+        case 'ppt':
+        case 'pptx':
+            return <Sliders className="h-6 w-6 mr-2" />;
+        case 'jpg':
+        case 'jpeg':
+        case 'png':
+        case 'gif':
+        case 'bmp':
+        case 'tiff':
+            return <Image className="h-6 w-6 mr-2" />;
+        case 'mp4':
+        case 'mkv':
+        case 'webm':
+        case 'avi':
+            return <FileVideo className="h-6 w-6 mr-2" />;
+        case 'mp3':
+        case 'wav':
+        case 'flac':
+            return <FileAudio className="h-6 w-6 mr-2" />;
+        case 'zip':
+        case 'rar':
+        case '7z':
+        case 'tar':
+        case 'gz':
+            return <FileArchive className="h-6 w-6 mr-2" />;
+        case 'html':
+        case 'css':
+        case 'js':
+        case 'jsx':
+        case 'ts':
+        case 'tsx':
+        case 'json':
+        case 'xml':
+            return <FileCode className="h-6 w-6 mr-2" />;
+        case 'txt':
+        case 'md':
+            return <FileText className="h-6 w-6 mr-2" />;
+        case 'xls':
+        case 'xlsx':
+            return <FileSpreadsheet className="h-6 w-6 mr-2" />;
+        default:
+            return <FileIcon className="h-6 w-6 mr-2" />;
+    }
+};
+
+
+const deleteOldFiles = async () => {// delete 10 days old files
+    const pb = new PocketBase('https://sujal.pockethost.io');
+    // Get the current date and subtract 10 days
+    const tenDaysAgo = new Date();
+    tenDaysAgo.setDate(tenDaysAgo.getDate() - 1);
+
+    // Format the date as a string that matches your date format (e.g., "YYYY-MM-DD HH:mm:ss")
+    const formattedDate = tenDaysAgo.toISOString().split('T')[0] + ' 00:00:00';
+
+    // Fetch the files created 10 days ago or earlier
+    const resultList = await pb.collection('files').getList(1, 50, {
+        filter: `created <= "${formattedDate}"`,
+    });
+
+    resultList.items.forEach(async (file) => {
+        await pb.collection('files').delete(file.id);
+    });
+}
 
 export function Upload() {
     const [loading, setLoading] = useState(false);
@@ -82,6 +170,8 @@ export function Upload() {
             toast.success('Uploaded Successfully');
             setUniqueCode(newUnique);
             setSelectedFiles([]);
+
+            deleteOldFiles();
         } catch (e: any) {
             console.error('Error Occurred:', e.message);
             toast.error('Sorry. We are unable to connect to server.');
@@ -148,7 +238,7 @@ export function Upload() {
                     <label
                         htmlFor="fileInput"
                         className="m-2 file:text-white bg-background relative cursor-pointer w-full border border-gray-500 p-2 rounded-sm"
-                    >
+                    > <FileSearch className='inline-block mr-2' />
                         {selectedFiles.length > 0
                             ? `${selectedFiles.length} file(s) selected`
                             : 'Select Files'}
@@ -166,6 +256,7 @@ export function Upload() {
                         disabled={loading}
                         className="w-full my-2 text-md"
                     >
+                        <UploadCloudIcon className='mr-2' />
                         Upload
                     </Button>
                     <Link
@@ -176,7 +267,7 @@ export function Upload() {
                             variant="outline"
                             className="w-full border border-gray-500 text-md"
                         >
-                            Get
+                            <DownloadCloudIcon className='mr-2' /> Get
                         </Button>
                     </Link>
                 </CardContent>
@@ -190,7 +281,7 @@ export function Upload() {
                                     className="flex items-center justify-between p-2 my-2 h-auto w-full"
                                 >
                                     <div className="flex items-center w-11/12">
-                                        <FileIcon className="w-4 h-4 mx-1" />
+                                        {getIconForFileType(file.name)}
                                         <div className="w-11/12 overflow-hidden text-ellipsis mx-1">
                                             {file.name}
                                         </div>
@@ -199,7 +290,7 @@ export function Upload() {
                                         onClick={() => deleteFile(index)}
                                         className="h-6 w-6 p-1 bg-primary/90 text-black border border-black"
                                     >
-                                        X
+                                        <X/>
                                     </Button>
                                 </li>
                             ))}

@@ -10,7 +10,7 @@ import { z } from 'zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Download } from 'lucide-react';
+import { Download, FileSearch2, UploadCloudIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import PocketBase from 'pocketbase';
 import toast from 'react-hot-toast';
@@ -139,10 +139,10 @@ export function FileView({ code = '' }: FileViewProps) {
                         className="w-full text-md"
                         onClick={handleFetchFiles}
                     >
-                        {loading ? 'Loading...' : 'Fetch Files'}
+                        <FileSearch2 className='mr-2'/> {loading ? 'Loading...' : 'Fetch Files'}
                     </Button>
                     <Link href={'/'}>
-                        <Button variant={'link'}>Upload Files Instead</Button>
+                        <Button variant={'link'}> <UploadCloudIcon className='mr-2'/> Upload Files Instead</Button>
                     </Link>
                 </CardContent>
             </Card>
