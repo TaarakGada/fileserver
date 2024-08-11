@@ -41,8 +41,14 @@ export function FileView({ code = '' }: FileViewProps) {
         );
 
     useEffect(() => {
-        if (code && code.length === 4 && !hasAttemptedFetch) {
-            fetchFiles(code);
+        if (
+            code &&
+            code.length === 4 &&
+            magicWordSchema.safeParse(code).success &&
+            !hasAttemptedFetch
+        ) {
+            const timer = setTimeout(() => fetchFiles(code), 200); // 200ms delay to ensure proper handling
+            return () => clearTimeout(timer); // Clean up timeout on unmount
         }
     }, [code, hasAttemptedFetch]);
 

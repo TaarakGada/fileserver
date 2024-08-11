@@ -32,6 +32,4 @@ export async function POST(req: NextRequest) {
         console.error('Error handling shared content:', error?.message);
         return NextResponse.redirect('/');
     }
-
-
 }
