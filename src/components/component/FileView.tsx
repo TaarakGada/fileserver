@@ -5,6 +5,8 @@ import {
     CardContent,
     Card,
 } from '@/components/ui/card';
+
+import { z } from 'zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -19,11 +21,24 @@ interface FileViewProps {
 
 export function FileView({ code = '' }: FileViewProps) {
     const pb = new PocketBase('https://sujal.pockethost.io');
+    const [fetchedCode, setFetchedCode] = useState<string>('');
     const [fileLinks, setFileLinks] = useState<string[]>([]);
-    const [magicWord, setMagicWord] = useState<string>(code.length == 4 ? code : '');
+    const [magicWord, setMagicWord] = useState<string>(
+        code.length == 4 ? code : ''
+    );
     const [collectionID, setCollectionId] = useState<string>('');
     const [loading, setLoading] = useState(false);
     const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
+
+    const [validation, setValidation] = useState(true);
+
+    const magicWordSchema = z
+        .string()
+        .length(4)
+        .regex(
+            /^[a-zA-Z]{2}[0-9]{2}$/,
+            'Code must be 2 letters followed by 2 digits'
+        );
 
     useEffect(() => {
         if (code && code.length === 4 && !hasAttemptedFetch) {
@@ -32,19 +47,33 @@ export function FileView({ code = '' }: FileViewProps) {
     }, [code, hasAttemptedFetch]);
 
     const fetchFiles = async (uniqueId: string) => {
+        if (!magicWordSchema.safeParse(uniqueId).success) {
+            toast.error('Invalid code');
+            return;
+        }
         setHasAttemptedFetch(true);
         setLoading(true);
+        toast.success('Fetching files...');
         try {
-            toast.success('Fetching files...');
             const res = await pb
                 .collection('files')
-                .getFirstListItem(`unique = "${uniqueId.trim().toLowerCase()}"`, {});
-
+                .getFirstListItem(
+                    `unique = "${uniqueId.trim().toLowerCase()}"`,
+                    {}
+                );
+            toast.success('Files found');
             setFileLinks(res.file);
             setCollectionId(res.id);
+            setFetchedCode(magicWord);
+            setMagicWord('');
         } catch (error: any) {
-            if (!error.toString().includes("ClientResponseError")) {
-                toast.error("Error: " + error?.toString());
+            if (error.toString().includes('ClientResponseError')) {
+                toast.error('No files associated to this code!');
+                setFileLinks([]);
+                setCollectionId('');
+                setMagicWord('');
+            } else {
+                toast.error('Error: ' + error?.toString());
             }
         } finally {
             setLoading(false);
@@ -72,17 +101,34 @@ export function FileView({ code = '' }: FileViewProps) {
                     <div className="grid w-full">
                         <Input
                             value={magicWord}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>
+                            ) => {
                                 setMagicWord(e.target.value);
+                                setValidation(
+                                    magicWordSchema.safeParse(e.target.value)
+                                        .success
+                                );
                             }}
                             id="word3"
                             placeholder="xx00"
                             type="text"
-                            className="border border-gray-500"
+                            className={`border ${
+                                !validation && !!magicWord.length
+                                    ? 'border-red-500 text-red-500'
+                                    : 'border-gray-500 text-primary/90'
+                            }`}
+                            maxLength={4}
+                            minLength={4}
                         />
+                        {!validation && !!magicWord.length && (
+                            <p className="text-red-500 text-sm mt-4">
+                                Code must be 2 letters followed by 2 digits
+                            </p>
+                        )}
                     </div>
                 </CardContent>
-                <CardContent className="flex items-center flex-col justify-center mt-4 gap-1">
+                <CardContent className="flex items-center flex-col justify-center gap-1">
                     <Button
                         className="w-full text-md"
                         onClick={handleFetchFiles}
@@ -95,7 +141,10 @@ export function FileView({ code = '' }: FileViewProps) {
                 </CardContent>
             </Card>
             {!!fileLinks.length && (
-                <Card className="w-full max-w-lg m-4">
+                <Card className="w-11/12 max-w-96 m-4">
+                    <CardHeader>
+                        <CardTitle>Files for code : {fetchedCode}</CardTitle>
+                    </CardHeader>
                     <CardContent>
                         {fileLinks.map((link) => (
                             <div
@@ -110,9 +159,9 @@ export function FileView({ code = '' }: FileViewProps) {
                                 >
                                     {link
                                         ? link.split('_')[0] +
-                                        (link.includes('.')
-                                            ? '.' + link.split('.')[1]
-                                            : '')
+                                          (link.includes('.')
+                                              ? '.' + link.split('.')[1]
+                                              : '')
                                         : ''}
                                 </a>
                             </div>
