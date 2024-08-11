@@ -1,10 +1,6 @@
-// app/api/share/route.js (for Next.js App Router)
-// or pages/api/share.js (for Next.js Pages Router)
-
 import { redirect } from 'next/navigation';
 import { NextRequest, NextResponse } from 'next/server';
 import PocketBase from 'pocketbase';
-
 
 function generateUniqueCode() {
     const alphabets = 'abcdefghijkmnopqrstuvwxyz';
@@ -13,13 +9,12 @@ function generateUniqueCode() {
     return twoAlphabets + twoNumbers;
 }
 
-
 export async function POST(req: NextRequest) {
-    let newUnique = '';
     try {
         const formData = await req.formData();
         const pb = new PocketBase('https://sujal.pockethost.io');
 
+        let newUnique;
         do {
             newUnique = generateUniqueCode();
         } while (await pb.collection('files').getFirstListItem(`unique="${newUnique}"`).catch(() => null));
@@ -27,11 +22,13 @@ export async function POST(req: NextRequest) {
         formData.append('unique', newUnique);
         await pb.collection('files').create(formData);
 
+        // Redirect to the show-code URL on success
+        return redirect("https://fs.sujal.xyz/show-" + newUnique);
+
     } catch (error: any) {
         console.error('Error handling shared content:', error?.message);
+
+        // Redirect to home on failure
         return redirect('https://fs.sujal.xyz/');
-    } finally {
-        // Ensure that the redirect happens after all the above operations
-        return redirect("https://fs.sujal.xyz/show-" + newUnique);
     }
 }
