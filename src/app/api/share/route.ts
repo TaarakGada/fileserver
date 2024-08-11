@@ -27,9 +27,9 @@ export async function POST(req: NextRequest) {
         console.error('Error handling shared content:', error?.message);
         
         // Redirect to home on failure
-        return NextResponse.redirect('https://fs.sujal.xyz/');
+        return redirect('https://fs.sujal.xyz/');
     } finally {  
         // Redirect to the show-code URL on success
-        return NextResponse.redirect("https://fs.sujal.xyz/show-" + newUnique);
+        return redirect("https://fs.sujal.xyz/show-" + newUnique);
     }
 }
