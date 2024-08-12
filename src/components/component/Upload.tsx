@@ -287,7 +287,7 @@ export function Upload() {
                             ) : null}
                         </CardContent>
                         <CardContent
-                            className={`p-4 w-11/12 h-28 flex items-center justify-center border text-gray-500 bg-background rounded-sm font-semibold ${
+                            className={` hidden p-4 w-11/12 h-28 items-center justify-center border text-gray-500 bg-background rounded-sm font-semibold sm:flex ${
                                 isDragging
                                     ? 'border-primary/90 border-dashed'
                                     : 'border-gray-500 border-dashed'
