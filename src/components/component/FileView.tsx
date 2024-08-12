@@ -24,7 +24,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Download, FileSearch2, UploadCloudIcon } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import PocketBase from 'pocketbase';
 import toast from 'react-hot-toast';
 
@@ -64,6 +64,15 @@ export function FileView({ code = '' }: FileViewProps) {
             return () => clearTimeout(timer); // Clean up timeout on unmount
         }
     }, [code, hasAttemptedFetch]);
+
+    const handleKeyPress = useCallback(
+        (event: KeyboardEvent) => {
+            if (event.key === 'Enter') {
+                handleFetchFiles();
+            }
+        },
+        [magicWord]
+    );
 
     const fetchFiles = async (uniqueId: string) => {
         if (!magicWordSchema.safeParse(uniqueId).success) {
@@ -174,7 +183,7 @@ export function FileView({ code = '' }: FileViewProps) {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="flex w-full p-4">
-                    <div className="grid w-full">
+                    <div className="grid w-full rounded-sm">
                         <Input
                             value={magicWord}
                             onChange={(
@@ -187,18 +196,24 @@ export function FileView({ code = '' }: FileViewProps) {
                                 );
                             }}
                             id="word3"
-                            placeholder="xx00"
+                            placeholder="XX00"
                             type="text"
-                            className={`border  w-full ${
+                            className={`border font-semibold w-full ${
                                 !validation && !!magicWord.length
                                     ? 'border-red-500 text-red-500'
                                     : 'border-gray-500 text-primary/90'
                             }`}
                             maxLength={4}
                             minLength={4}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault(); // Prevent form submission if it's within a form
+                                    handleFetchFiles();
+                                }
+                            }}
                         />
                         {!validation && !!magicWord.length && (
-                            <p className="text-red-500 text-sm mt-4">
+                            <p className="text-red-500 text-sm mt-4 text-center">
                                 Code must be 2 letters followed by 2 digits
                             </p>
                         )}
