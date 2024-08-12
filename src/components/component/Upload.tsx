@@ -77,8 +77,8 @@ const getIconForFileType = (name: string) => {
     }
 };
 
-
-const deleteOldFiles = async () => {// delete 10 days old files
+const deleteOldFiles = async () => {
+    // delete 10 days old files
     const pb = new PocketBase('https://sujal.pockethost.io');
     // Get the current date and subtract 10 days
     const tenDaysAgo = new Date();
@@ -95,7 +95,7 @@ const deleteOldFiles = async () => {// delete 10 days old files
     resultList.items.forEach(async (file) => {
         await pb.collection('files').delete(file.id);
     });
-}
+};
 
 export function Upload() {
     const [loading, setLoading] = useState(false);
@@ -141,7 +141,26 @@ export function Upload() {
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
-            setSelectedFiles(Array.from(event.target.files));
+            const newFiles = Array.from(event.target.files);
+
+            setSelectedFiles((prevFiles) => {
+                const updatedFiles = [...prevFiles];
+
+                newFiles.forEach((newFile) => {
+                    const isDuplicate = updatedFiles.some(
+                        (existingFile) =>
+                            existingFile.name === newFile.name &&
+                            existingFile.size === newFile.size &&
+                            existingFile.type === newFile.type
+                    );
+
+                    if (!isDuplicate) {
+                        updatedFiles.push(newFile);
+                    }
+                });
+
+                return updatedFiles;
+            });
         }
     };
 
@@ -238,10 +257,12 @@ export function Upload() {
                     <label
                         htmlFor="fileInput"
                         className="m-2 file:text-white bg-background relative cursor-pointer w-full border border-gray-500 p-2 rounded-sm"
-                    > <FileSearch className='inline-block mr-2' />
+                    >
+                        {' '}
+                        <FileSearch className="inline-block mr-2" />
                         {selectedFiles.length > 0
                             ? `${selectedFiles.length} file(s) selected`
-                            : 'Select Files'}
+                            : 'Click here to select files'}
                         <input
                             type="file"
                             id="fileInput"
@@ -256,7 +277,7 @@ export function Upload() {
                         disabled={loading}
                         className="w-full my-2 text-md"
                     >
-                        <UploadCloudIcon className='mr-2' />
+                        <UploadCloudIcon className="mr-2" />
                         Upload
                     </Button>
                     <Link
@@ -267,7 +288,7 @@ export function Upload() {
                             variant="outline"
                             className="w-full border border-gray-500 text-md"
                         >
-                            <DownloadCloudIcon className='mr-2' /> Get
+                            <DownloadCloudIcon className="mr-2" /> Get
                         </Button>
                     </Link>
                 </CardContent>
@@ -290,7 +311,7 @@ export function Upload() {
                                         onClick={() => deleteFile(index)}
                                         className="h-6 w-6 p-1 bg-primary/90 text-black border border-black"
                                     >
-                                        <X/>
+                                        <X />
                                     </Button>
                                 </li>
                             ))}

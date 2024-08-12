@@ -6,6 +6,19 @@ import {
     Card,
 } from '@/components/ui/card';
 
+import {
+    FileArchive,
+    FileAudio,
+    FileCode,
+    FileIcon,
+    FileSearch,
+    FileSpreadsheet,
+    FileText,
+    FileVideo,
+    Image,
+    Sliders,
+} from 'lucide-react';
+
 import { z } from 'zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -94,6 +107,63 @@ export function FileView({ code = '' }: FileViewProps) {
         fetchFiles(magicWord);
     };
 
+    const getIconForFileType = (name: string) => {
+        const fileExt = name.split('.').pop()?.toLowerCase();
+        switch (fileExt) {
+            case 'pdf':
+                return <FileIcon className="h-6 w-6 mr-2" />;
+            case 'doc':
+            case 'docx':
+                return <FileText className="h-6 w-6 mr-2" />;
+            case 'xls':
+            case 'xlsx':
+            case 'csv':
+                return <FileSpreadsheet className="h-6 w-6 mr-2" />;
+            case 'ppt':
+            case 'pptx':
+                return <Sliders className="h-6 w-6 mr-2" />;
+            case 'jpg':
+            case 'jpeg':
+            case 'png':
+            case 'gif':
+            case 'bmp':
+            case 'tiff':
+                return <Image className="h-6 w-6 mr-2" />;
+            case 'mp4':
+            case 'mkv':
+            case 'webm':
+            case 'avi':
+                return <FileVideo className="h-6 w-6 mr-2" />;
+            case 'mp3':
+            case 'wav':
+            case 'flac':
+                return <FileAudio className="h-6 w-6 mr-2" />;
+            case 'zip':
+            case 'rar':
+            case '7z':
+            case 'tar':
+            case 'gz':
+                return <FileArchive className="h-6 w-6 mr-2" />;
+            case 'html':
+            case 'css':
+            case 'js':
+            case 'jsx':
+            case 'ts':
+            case 'tsx':
+            case 'json':
+            case 'xml':
+                return <FileCode className="h-6 w-6 mr-2" />;
+            case 'txt':
+            case 'md':
+                return <FileText className="h-6 w-6 mr-2" />;
+            case 'xls':
+            case 'xlsx':
+                return <FileSpreadsheet className="h-6 w-6 mr-2" />;
+            default:
+                return <FileIcon className="h-6 w-6 mr-2" />;
+        }
+    };
+
     return (
         <>
             <Card className="h-auto w-11/12 max-w-96 flex flex-col items-center justify-center">
@@ -103,7 +173,7 @@ export function FileView({ code = '' }: FileViewProps) {
                         Confused? Try uploading a file before receiving the code
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="flex gap-4">
+                <CardContent className="flex w-full p-4">
                     <div className="grid w-full">
                         <Input
                             value={magicWord}
@@ -119,7 +189,7 @@ export function FileView({ code = '' }: FileViewProps) {
                             id="word3"
                             placeholder="xx00"
                             type="text"
-                            className={`border ${
+                            className={`border  w-full ${
                                 !validation && !!magicWord.length
                                     ? 'border-red-500 text-red-500'
                                     : 'border-gray-500 text-primary/90'
@@ -134,47 +204,74 @@ export function FileView({ code = '' }: FileViewProps) {
                         )}
                     </div>
                 </CardContent>
-                <CardContent className="flex items-center flex-col justify-center gap-1">
+                <CardContent className="px-4 m-auto flex flex-col items-center w-full">
                     <Button
-                        className="w-full text-md"
+                        className="w-full text-md my-2"
                         onClick={handleFetchFiles}
                     >
-                        <FileSearch2 className='mr-2'/> {loading ? 'Loading...' : 'Fetch Files'}
+                        <FileSearch2 className="mr-2" />{' '}
+                        {loading ? 'Loading...' : 'Fetch Files'}
                     </Button>
-                    <Link href={'/'}>
-                        <Button variant={'link'}> <UploadCloudIcon className='mr-2'/> Upload Files Instead</Button>
+                    <Link
+                        href={'/'}
+                        className=" w-full my-2"
+                    >
+                        <Button
+                            variant="outline"
+                            className="w-full border border-gray-500 text-md"
+                        >
+                            {' '}
+                            <UploadCloudIcon className="mr-2" /> Upload Files
+                            Instead
+                        </Button>
                     </Link>
                 </CardContent>
-            </Card>
-            {!!fileLinks.length && (
-                <Card className="w-11/12 max-w-96 m-4">
-                    <CardHeader>
-                        <CardTitle>Files for code : {fetchedCode}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {fileLinks.map((link) => (
-                            <div
-                                key={link}
-                                className="flex items-center mt-4 space-x-2"
-                            >
-                                <Download className="w-4 h-4" />
-                                <a
-                                    target="_blank"
-                                    href={`https://sujal.pockethost.io/api/files/files/${collectionID}/${link}`}
-                                    download
-                                >
-                                    {link
-                                        ? link.split('_')[0] +
-                                          (link.includes('.')
-                                              ? '.' + link.split('.')[1]
-                                              : '')
-                                        : ''}
-                                </a>
-                            </div>
-                        ))}
+                {!!fileLinks.length && (
+                    <CardContent className="w-full p-0">
+                        <CardHeader className="px-6 pt-6 pb-4">
+                            <CardTitle>
+                                Files for code : {fetchedCode.toUpperCase()}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {fileLinks.map((link) => {
+                                const fileName = link
+                                    ? link.split('_')[0] +
+                                      (link.includes('.')
+                                          ? '.' + link.split('.')[1]
+                                          : '')
+                                    : '';
+                                return (
+                                    <div
+                                        key={link}
+                                        className="flex items-center justify-between mt-2 py-2 rounded-md"
+                                    >
+                                        <div className="flex items-center flex-grow">
+                                            {getIconForFileType(fileName)}
+                                            <a
+                                                href={`https://sujal.pockethost.io/api/files/files/${collectionID}/${link}`}
+                                                className="text-lg underline underline-offset-1 font-semibold truncate max-w-[200px]"
+                                                title={fileName}
+                                            >
+                                                {fileName}
+                                            </a>
+                                        </div>
+                                        <a
+                                            href={`https://sujal.pockethost.io/api/files/files/${collectionID}/${link}`}
+                                            download
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-gray-500 hover:text-gray-700"
+                                        >
+                                            <Download className="w-6 h-6 text-white" />
+                                        </a>
+                                    </div>
+                                );
+                            })}
+                        </CardContent>
                     </CardContent>
-                </Card>
-            )}
+                )}
+            </Card>
         </>
     );
 }
