@@ -27,6 +27,8 @@ import { Download, FileSearch2, UploadCloudIcon } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import PocketBase from 'pocketbase';
 import toast from 'react-hot-toast';
+import { Textarea } from '../ui/textarea';
+import { off } from 'process';
 
 interface FileViewProps {
     code?: string;
@@ -42,7 +44,7 @@ export function FileView({ code = '' }: FileViewProps) {
     const [collectionID, setCollectionId] = useState<string>('');
     const [loading, setLoading] = useState(false);
     const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
-
+    const [textFileContent, setTextFileContent] = useState<string>('');
     const [validation, setValidation] = useState(true);
 
     const magicWordSchema = z
@@ -89,11 +91,23 @@ export function FileView({ code = '' }: FileViewProps) {
                     `unique = "${uniqueId.trim().toLowerCase()}"`,
                     {}
                 );
+            console.log(res);
             toast.success('Files found');
             setFileLinks(res.file);
             setCollectionId(res.id);
             setFetchedCode(magicWord);
             setMagicWord('');
+            const userInputFile = res.file.find((file: string) =>
+                file.startsWith('user_input')
+            );
+            if (userInputFile) {
+                const fileUrl = `https://sujal.pockethost.io/api/files/files/${res.id}/${userInputFile}`;
+                const response = await fetch(fileUrl);
+                const text = await response.text();
+                setTextFileContent(text);
+            } else {
+                setTextFileContent('');
+            }
         } catch (error: any) {
             if (error.toString().includes('ClientResponseError')) {
                 toast.error('No files associated to this code!');
@@ -114,6 +128,11 @@ export function FileView({ code = '' }: FileViewProps) {
             return;
         }
         fetchFiles(magicWord);
+    };
+
+    const handleCopyToClipboard = () => {
+        navigator.clipboard.writeText(textFileContent);
+        toast.success('Copied to clipboard');
     };
 
     const getIconForFileType = (name: string) => {
@@ -241,7 +260,7 @@ export function FileView({ code = '' }: FileViewProps) {
                         </Button>
                     </Link>
                 </CardContent>
-                {!!fileLinks.length && (
+                {!!fileLinks.length && !textFileContent && (
                     <CardContent className="w-full p-0">
                         <CardHeader className="px-6 pt-6 pb-4">
                             <CardTitle>
@@ -284,6 +303,29 @@ export function FileView({ code = '' }: FileViewProps) {
                                 );
                             })}
                         </CardContent>
+                    </CardContent>
+                )}
+                {textFileContent && (
+                    <CardContent className="w-full px-4 pb-4">
+                        <CardHeader className="px-0 pb-4 pt-0">
+                            <CardTitle className="p-0">
+                                Text for code : {fetchedCode}
+                            </CardTitle>
+                        </CardHeader>
+
+                        <Textarea
+                            value={textFileContent}
+                            className="min-h-52 text-white"
+                            wrap="off"
+                            disabled
+                        />
+
+                        <Button
+                            onClick={() => handleCopyToClipboard()}
+                            className="mt-4"
+                        >
+                            Copy to clipboard
+                        </Button>
                     </CardContent>
                 )}
             </Card>

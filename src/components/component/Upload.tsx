@@ -27,6 +27,8 @@ import {
     Image,
 } from 'lucide-react';
 import { set } from 'zod';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Textarea } from '../ui/textarea';
 
 const getIconForFileType = (name: string) => {
     const fileExt = name.split('.').pop()?.toLowerCase();
@@ -112,6 +114,8 @@ export function Upload() {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [isDragging, setIsDragging] = useState(false);
     const [isUploaded, setIsUploaded] = useState(false);
+    const [activeTab, setActiveTab] = useState('files');
+    const [textInput, setTextInput] = useState('');
 
     useEffect(() => {
         if (isPWA() && 'launchQueue' in window) {
@@ -131,20 +135,13 @@ export function Upload() {
     }, []);
 
     useEffect(() => {
-        const handlePaste = (e: ClipboardEvent) => {
-            const items = e.clipboardData?.items;
-            if (items) {
-                const files = Array.from(items)
-                    .filter((item) => item.kind === 'file')
-                    .map((item) => item.getAsFile())
-                    .filter((file): file is File => file !== null);
-                handleNewFiles(files);
-            }
-        };
-
-        window.addEventListener('paste', handlePaste);
-        return () => window.removeEventListener('paste', handlePaste);
-    }, []);
+        if (activeTab === 'text') {
+            setSelectedFiles([]);
+        }
+        if (activeTab === 'files') {
+            setTextInput('');
+        }
+    }, [activeTab]);
 
     const isPWA = () => {
         return (
@@ -173,7 +170,7 @@ export function Upload() {
     };
 
     const handleUpload = async (filesToUpload: File[] = selectedFiles) => {
-        if (!filesToUpload.length) {
+        if (!filesToUpload.length && !textInput.trim()) {
             toast.error('Please select files to upload');
             return;
         }
@@ -191,6 +188,15 @@ export function Upload() {
 
             const formData = new FormData();
             filesToUpload.forEach((file) => formData.append('file', file));
+
+            if (textInput.trim()) {
+                const textBlob = new Blob([textInput], { type: 'text/plain' });
+                const textFile = new File([textBlob], 'user_input.txt', {
+                    type: 'text/plain',
+                });
+                formData.append('file', textFile);
+            }
+
             formData.append('unique', newUnique);
 
             await pb.collection('files').create(formData);
@@ -247,14 +253,49 @@ export function Upload() {
         });
     };
 
+    useEffect(() => {
+        const handlePaste = (e: ClipboardEvent) => {
+            e.preventDefault();
+
+            const items = e.clipboardData?.items;
+            if (items) {
+                if (activeTab === 'files') {
+                    const files = Array.from(items)
+                        .filter((item) => item.kind === 'file')
+                        .map((item) => item.getAsFile())
+                        .filter((file): file is File => file !== null);
+                    if (files.length > 0) {
+                        handleNewFiles(files);
+                    }
+                } else {
+                    const textItem = Array.from(items).find(
+                        (item) => item.kind === 'string'
+                    );
+                    if (textItem) {
+                        textItem.getAsString((text) => {
+                            console.log('Pasted text:', text);
+                            setTextInput(textInput + text);
+                        });
+                    }
+                }
+            }
+        };
+
+        document.addEventListener('paste', handlePaste);
+
+        return () => {
+            document.removeEventListener('paste', handlePaste);
+        };
+    }, [activeTab, handleNewFiles, setTextInput]);
+
     return (
         <>
             <Card
                 className={
-                    'h-auto w-11/12 max-w-96 flex flex-col items-center justify-center m-auto'
+                    'h-auto w-11/12 max-w-96 flex flex-col items-center justify-center m-auto p-4'
                 }
             >
-                <CardContent className="p-4 m-auto text-center">
+                <CardContent className="p-0 mb-2 mx-auto text-center">
                     <h1 className="text-4xl font-bold">File Share</h1>
                     <p className="text-sm mt-4 text-gray-500 dark:text-gray-400">
                         Temporary File Server
@@ -262,122 +303,189 @@ export function Upload() {
                 </CardContent>
 
                 {!isUploaded && (
-                    <>
-                        <CardContent className="px-4 pb-2 text-center">
-                            {loading ? (
-                                <div role="status">
-                                    <svg
-                                        aria-hidden="true"
-                                        className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-primary/90"
-                                        viewBox="0 0 100 101"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                                            fill="currentColor"
-                                        />
-                                        <path
-                                            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                                            fill="currentFill"
-                                        />
-                                    </svg>
-                                    <span className="sr-only">Loading...</span>
-                                </div>
-                            ) : null}
-                        </CardContent>
-                        <CardContent
-                            className={` hidden p-4 w-11/12 h-28 items-center justify-center border text-gray-500 bg-background rounded-sm font-semibold sm:flex ${
-                                isDragging
-                                    ? 'border-primary/90 border-dashed'
-                                    : 'border-gray-500 border-dashed'
-                            }
-                    }`}
-                            onDragOver={handleDragOver}
-                            onDragLeave={handleDragLeave}
-                            onDrop={handleDrop}
+                    <CardContent className="p-0 text-center w-full flex flex-col items-center justify-center">
+                        <Tabs
+                            value={activeTab}
+                            onValueChange={setActiveTab}
+                            className="w-full flex flex-col justify-center items-center"
                         >
-                            {isDragging ? (
-                                <>
-                                    <PackageOpen className="m-2" />
-                                    Drop your files here
-                                </>
-                            ) : (
-                                <>
-                                    <Package className="m-2" />
-                                    Drag your files here
-                                </>
-                            )}
-                        </CardContent>
-                        <CardContent className="p-4 m-auto flex flex-col items-center w-full">
-                            <label
-                                htmlFor="fileInput"
-                                className="m-2 file:text-white bg-background relative cursor-pointer w-full border border-gray-500 p-2 rounded-sm text-center hover:bg-accent/90"
+                            <TabsList className="my-2">
+                                <TabsTrigger value="files">Files</TabsTrigger>
+                                <TabsTrigger value="text">Text</TabsTrigger>
+                            </TabsList>
+                            <TabsContent
+                                value="files"
+                                className="flex flex-col justify-center items-center w-full m-0"
                             >
-                                {' '}
-                                <FileSearch className="inline-block mr-2" />
-                                {selectedFiles.length > 0
-                                    ? `${selectedFiles.length} file(s) selected`
-                                    : 'Click here to select files'}
-                                <input
-                                    type="file"
-                                    id="fileInput"
-                                    multiple
-                                    onChange={handleFileChange}
-                                    className="hidden"
-                                />
-                            </label>
-                            <Button
-                                onClick={() => handleUpload()}
-                                variant="default"
-                                disabled={loading}
-                                className="w-full my-2 text-md"
-                            >
-                                <UploadCloudIcon className="mr-2" />
-                                Upload
-                            </Button>
-                            <Link
-                                href="/get"
-                                className="w-full m-2"
-                            >
-                                <Button
-                                    variant="outline"
-                                    className="w-full border border-gray-500 text-md"
-                                >
-                                    <DownloadCloudIcon className="mr-2" /> Get
-                                </Button>
-                            </Link>
-                        </CardContent>
-
-                        {selectedFiles.length > 0 && (
-                            <div className="m-2 w-full">
-                                <ul className="p-2">
-                                    {selectedFiles.map((file, index) => (
-                                        <li
-                                            key={index}
-                                            className="flex items-center justify-between p-2 my-2 h-auto w-full"
+                                <div className="w-full my-2">
+                                    {loading ? (
+                                        <div
+                                            role="status"
+                                            className="flex items-center justify-center mb-4"
                                         >
-                                            <div className="flex items-center w-11/12">
-                                                {getIconForFileType(file.name)}
-                                                <div className="w-11/12 overflow-hidden text-ellipsis mx-1">
-                                                    {file.name}
-                                                </div>
-                                            </div>
-                                            <Button
-                                                onClick={() =>
-                                                    deleteFile(index)
-                                                }
-                                                className="h-6 w-6 p-1 bg-primary/90 text-black border border-black"
+                                            <svg
+                                                aria-hidden="true"
+                                                className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-primary/90"
+                                                viewBox="0 0 100 101"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
                                             >
-                                                <X />
-                                            </Button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
-                    </>
+                                                <path
+                                                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                    fill="currentColor"
+                                                />
+                                                <path
+                                                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                    fill="currentFill"
+                                                />
+                                            </svg>
+                                            <span className="sr-only">
+                                                Loading...
+                                            </span>
+                                        </div>
+                                    ) : null}
+
+                                    <CardContent
+                                        className={` hidden p-0 w-full h-28 items-center justify-center border text-gray-500 bg-background rounded-sm font-semibold sm:flex ${
+                                            isDragging
+                                                ? 'border-primary/90 border-dashed'
+                                                : 'border-gray-500 border-dashed'
+                                        }
+                    }`}
+                                        onDragOver={handleDragOver}
+                                        onDragLeave={handleDragLeave}
+                                        onDrop={handleDrop}
+                                    >
+                                        {isDragging ? (
+                                            <>
+                                                <PackageOpen className="m-2" />
+                                                Drop your files here
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Package className="m-2" />
+                                                Drag your files here
+                                            </>
+                                        )}
+                                    </CardContent>
+                                    <CardContent className="p-0 m-auto flex flex-col items-center w-full">
+                                        <label
+                                            htmlFor="fileInput"
+                                            className="m-2 file:text-white bg-background relative cursor-pointer w-full border border-gray-500 p-2 rounded-sm text-center hover:bg-accent/90"
+                                        >
+                                            {' '}
+                                            <FileSearch className="inline-block mr-2" />
+                                            {selectedFiles.length > 0
+                                                ? `${selectedFiles.length} file(s) selected`
+                                                : 'Click here to select files'}
+                                            <input
+                                                type="file"
+                                                id="fileInput"
+                                                multiple
+                                                onChange={handleFileChange}
+                                                className="hidden"
+                                            />
+                                        </label>
+                                    </CardContent>
+                                </div>
+                            </TabsContent>
+                            <TabsContent
+                                value="text"
+                                className="flex flex-col justify-center items-center w-full m-0"
+                            >
+                                {loading ? (
+                                    <div
+                                        role="status"
+                                        className="flex items-center justify-center mb-4"
+                                    >
+                                        <svg
+                                            aria-hidden="true"
+                                            className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-primary/90"
+                                            viewBox="0 0 100 101"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                fill="currentColor"
+                                            />
+                                            <path
+                                                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                fill="currentFill"
+                                            />
+                                        </svg>
+                                        <span className="sr-only">
+                                            Loading...
+                                        </span>
+                                    </div>
+                                ) : null}
+                                <Textarea
+                                    className="w-full my-2 min-h-52"
+                                    placeholder="Paste the text you want to share here."
+                                    value={textInput}
+                                    wrap="off"
+                                    onChange={(e) =>
+                                        setTextInput(e.target.value)
+                                    }
+                                />
+                            </TabsContent>
+                            <CardContent className="p-0 flex flex-col items-center w-full">
+                                <Button
+                                    onClick={() => handleUpload()}
+                                    variant="default"
+                                    disabled={loading}
+                                    className="w-full my-2 text-md"
+                                >
+                                    <UploadCloudIcon className="mr-2" />
+                                    Upload
+                                </Button>
+                                <Link
+                                    href="/get"
+                                    className="w-full m-2"
+                                >
+                                    <Button
+                                        variant="outline"
+                                        className="w-full border border-gray-500 text-md"
+                                    >
+                                        <DownloadCloudIcon className="mr-2" />{' '}
+                                        Get
+                                    </Button>
+                                </Link>
+                            </CardContent>
+
+                            {selectedFiles.length > 0 && (
+                                <div className="m-2 w-full">
+                                    <ul className="">
+                                        {selectedFiles.map((file, index) => (
+                                            <li
+                                                key={index}
+                                                className="flex items-center justify-between py-2 my-2 h-auto w-full"
+                                            >
+                                                <div className="flex items-center w-11/12">
+                                                    {getIconForFileType(
+                                                        file.name
+                                                    )}
+                                                    <div className="w-11/12 overflow-hidden text-ellipsis mx-1 text-left">
+                                                        {file.name}
+                                                    </div>
+                                                </div>
+                                                <Button
+                                                    onClick={() =>
+                                                        deleteFile(index)
+                                                    }
+                                                    className="h-6 w-6 p-1 bg-primary/90 text-black border border-black"
+                                                >
+                                                    <X />
+                                                </Button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </Tabs>
+                    </CardContent>
                 )}
+
                 {isUploaded && (
                     <>
                         <CardContent className="px-4 py-0 text-center">
