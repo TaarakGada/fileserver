@@ -31,6 +31,8 @@ import {
 import { set } from 'zod';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Textarea } from '../ui/textarea';
+import { getRandomFileFact } from '@/app/actions';
+import RandomFact from './RandomFact';
 
 const getIconForFileType = (name: string) => {
     const fileExt = name.split('.').pop()?.toLowerCase();
@@ -371,11 +373,10 @@ export function Upload() {
                                         ) : null}
 
                                         <CardContent
-                                            className={` hidden p-0 w-full h-28 items-center justify-center border text-gray-500 bg-background rounded-sm font-semibold sm:flex ${
-                                                isDragging
-                                                    ? 'border-primary/90 border-dashed'
-                                                    : 'border-gray-500 border-dashed'
-                                            }
+                                            className={` hidden p-0 w-full h-28 items-center justify-center border text-gray-500 bg-background rounded-sm font-semibold sm:flex ${isDragging
+                                                ? 'border-primary/90 border-dashed'
+                                                : 'border-gray-500 border-dashed'
+                                                }
                     }`}
                                             onDragOver={handleDragOver}
                                             onDragLeave={handleDragLeave}
@@ -598,6 +599,20 @@ export function Upload() {
                                     Clear
                                 </Button>
                             )}
+                        </div>
+                    </div>
+                )}
+
+                {activeTab !== 'text' && isDesktop && selectedFiles.length == 0  && (
+                    <div className="w-6/12 h-full m-auto">
+                        <div className="relative w-full">
+                            <div
+                                className="w-full my-2 h-[650px]"
+                            > 
+                                <CardContent className='flex px-[10%] h-full justify-center items-center text-3xl '>
+                                        <RandomFact />
+                                </CardContent>
+                            </div>
                         </div>
                     </div>
                 )}
