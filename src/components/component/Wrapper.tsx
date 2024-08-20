@@ -43,7 +43,7 @@ function Wrapper({ children }: { children: React.ReactNode }) {
                 {showInstallPrompt && (
                     <Button
                         onClick={handleInstall}
-                        className="m-2"
+                        className="m-2 md:hidden"
                     >
                         <DownloadIcon className="mr-2" /> Install App
                     </Button>
