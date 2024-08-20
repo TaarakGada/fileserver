@@ -118,7 +118,7 @@ export function Upload() {
     const [isUploaded, setIsUploaded] = useState(false);
     const [activeTab, setActiveTab] = useState('files');
     const [textInput, setTextInput] = useState('');
-    const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+    const [isDesktop, setIsDesktop] = useState(true);
 
     useEffect(() => {
         const mediaQuery = window.matchMedia('(min-width: 1024px)');
