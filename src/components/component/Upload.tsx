@@ -123,6 +123,10 @@ export function Upload() {
     const [isDesktop, setIsDesktop] = useState(true);
 
     useEffect(() => {
+        console.log(selectedFiles);
+    }, [selectedFiles]);
+
+    useEffect(() => {
         const mediaQuery = window.matchMedia('(min-width: 1024px)');
 
         const handleMediaChange = (event: MediaQueryListEvent) => {
@@ -239,7 +243,11 @@ export function Upload() {
     };
 
     const deleteFile = (index: number) => {
-        setSelectedFiles((files) => files.filter((_, i) => i !== index));
+        setSelectedFiles((files) => {
+            const updatedFiles = [...files];
+            updatedFiles.splice(index, 1);
+            return updatedFiles;
+        });
     };
 
     const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
@@ -297,7 +305,6 @@ export function Upload() {
                     );
                     if (textItem) {
                         textItem.getAsString((text) => {
-                            console.log('Pasted text:', text);
                             setTextInput(textInput + text);
                         });
                     }
@@ -373,10 +380,11 @@ export function Upload() {
                                         ) : null}
 
                                         <CardContent
-                                            className={` hidden p-0 w-full h-28 items-center justify-center border text-gray-500 bg-background rounded-sm font-semibold sm:flex ${isDragging
-                                                ? 'border-primary/90 border-dashed'
-                                                : 'border-gray-500 border-dashed'
-                                                }
+                                            className={` hidden p-0 w-full h-28 items-center justify-center border text-gray-500 bg-background rounded-sm font-semibold sm:flex ${
+                                                isDragging
+                                                    ? 'border-primary/90 border-dashed'
+                                                    : 'border-gray-500 border-dashed'
+                                            }
                     }`}
                                             onDragOver={handleDragOver}
                                             onDragLeave={handleDragLeave}
@@ -408,7 +416,10 @@ export function Upload() {
                                                     type="file"
                                                     id="fileInput"
                                                     multiple
-                                                    onChange={handleFileChange}
+                                                    onChange={(event) => {
+                                                        handleFileChange(event);
+                                                        event.target.value = '';
+                                                    }}
                                                     className="hidden"
                                                 />
                                             </label>
@@ -603,19 +614,19 @@ export function Upload() {
                     </div>
                 )}
 
-                {activeTab !== 'text' && isDesktop && selectedFiles.length == 0  && (
-                    <div className="w-6/12 h-full m-auto">
-                        <div className="relative w-full">
-                            <div
-                                className="w-full my-2 h-[650px]"
-                            > 
-                                <CardContent className='flex px-[10%] h-full justify-center items-center text-3xl '>
+                {activeTab !== 'text' &&
+                    isDesktop &&
+                    selectedFiles.length == 0 && (
+                        <div className="w-6/12 h-full m-auto">
+                            <div className="relative w-full">
+                                <div className="w-full my-2 h-[650px]">
+                                    <CardContent className="flex px-[10%] h-full justify-center items-center text-3xl ">
                                         <RandomFact />
-                                </CardContent>
+                                    </CardContent>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
                 {activeTab === 'files' &&
                     isDesktop &&
