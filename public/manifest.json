@@ -10,28 +10,14 @@
     "file_handlers": [
         {
             "action": "/",
-            "file_handlers": [
-                {
-                    "action": "/",
-                    "accept": {
-                        "application/*": [
-                            "."
-                        ],
-                        "audio/*": [
-                            "."
-                        ],
-                        "image/*": [
-                            "."
-                        ],
-                        "text/*": [
-                            "."
-                        ],
-                        "video/*": [
-                            "."
-                        ]
-                    }
-                }
-            ]
+            "accept": {
+                "application/pdf": [".pdf"],
+                "audio/mpeg": [".mp3"],
+                "image/png": [".png"],
+                "image/jpeg": [".jpg", ".jpeg"],
+                "text/plain": [".txt"],
+                "video/mp4": [".mp4"]
+            }
         }
     ],
     "share_target": {

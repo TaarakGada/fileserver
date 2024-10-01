@@ -20,7 +20,11 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`dark h-screen relative ${inter.className || ''}`}>
+            <body
+                className={`dark min-h-screen relative flex flex-col  ${
+                    inter.className || ''
+                }`}
+            >
                 <Head>
                     <meta
                         name="viewport"
@@ -80,7 +84,7 @@ export default function RootLayout({
                         href="/favicon.ico"
                     />
                 </Head>
-                <Toaster position="bottom-left" />
+                <Toaster position="top-center" />
                 {children}
                 <BackgroundBeams className="-z-10" />
             </body>

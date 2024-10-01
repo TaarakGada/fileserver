@@ -1,0 +1,7 @@
+# Allow all crawlers to access the home page
+User-agent: *
+Allow: /
+
+# Allow all crawlers to access the /get page for fetching files
+User-agent: *
+Allow: /get
