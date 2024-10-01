@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Download } from 'lucide-react';
 
 function Header() {
-    const [showInstructions, setShowInstructions] = useState(false);
-    const [showInstallPrompt, setShowInstallPrompt] = useState(true);
+    const [showInstallPrompt, setShowInstallPrompt] = useState(false);
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
     useEffect(() => {
@@ -12,10 +11,23 @@ function Header() {
             setDeferredPrompt(e);
             setShowInstallPrompt(true);
         };
+
+        const checkInstallation = () => {
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                setShowInstallPrompt(false);
+            }
+        };
+
         window.addEventListener(
             'beforeinstallprompt',
             handleBeforeInstallPrompt
         );
+        window.addEventListener('appinstalled', () =>
+            setShowInstallPrompt(false)
+        );
+
+        checkInstallation();
+
         return () => {
             window.removeEventListener(
                 'beforeinstallprompt',
@@ -34,6 +46,7 @@ function Header() {
             setDeferredPrompt(null);
         }
     };
+
     return (
         <div className="px-4 flex items-center justify-between w-full bg-card">
             <div className="w-full text-left font-semibold text-4xl bg-card py-4">

@@ -128,7 +128,7 @@ function Upload() {
     return (
         <>
             {!isUploaded && (
-                <div className="flex flex-col flex-grow justify-center w-full p-2 py-4">
+                <div className="flex flex-col flex-grow justify-center w-full p-2">
                     <div className="w-full flex justify-center rounded">
                         <div className="p-2 bg-card rounded-xl flex justify-center items-center shadow-md">
                             <Button
