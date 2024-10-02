@@ -146,7 +146,7 @@ export function Recieve({ code = '' }: RecieveProps) {
 
     return (
         <>
-            <div className="flex flex-col flex-grow justify-center w-full p-4">
+            <div className="flex flex-col flex-grow justify-center w-full p-2">
                 {!hasAttemptedFetch && (
                     <div className="flex flex-col flex-grow items-center h-full">
                         <div className="w-full flex-grow items-center justify-center flex flex-col">
