@@ -281,7 +281,7 @@ export function Recieve({ code = '' }: RecieveProps) {
                 )}
             </div>
             {loading && (
-                <div className="absolute z-20 h-screen top-0 left-0 bg-black/80 flex flex-col justify-center items-center w-full">
+                <div className="absolute z-20 h-dvh top-0 left-0 bg-black/80 flex flex-col justify-center items-center w-full">
                     <Loader />
                 </div>
             )}

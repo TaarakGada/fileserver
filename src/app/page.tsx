@@ -41,7 +41,7 @@ export default function Home() {
     return (
         <>
             {isMobile ? (
-                <div className="flex flex-col justify-center items-center w-full h-screen">
+                <div className="flex flex-col justify-center items-center w-full h-dvh">
                     <Header />
                     <main className="flex flex-grow flex-col justify-center items-center w-full">
                         <Upload />

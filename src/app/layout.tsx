@@ -21,7 +21,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body
-                className={`dark min-h-screen relative flex flex-col  ${
+                className={`dark min-h-dvh relative flex flex-col  ${
                     inter.className || ''
                 }`}
             >

@@ -234,7 +234,7 @@ function Upload() {
                 />
             )}
             {loading && (
-                <div className="absolute z-20 h-screen top-0 left-0 bg-black/85 flex flex-col justify-center items-center w-full">
+                <div className="absolute z-20 h-dvh top-0 left-0 bg-black/85 flex flex-col justify-center items-center w-full">
                     <Loader />
                 </div>
             )}

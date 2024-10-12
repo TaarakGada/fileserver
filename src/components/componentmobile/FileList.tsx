@@ -26,6 +26,21 @@ const FileList: React.FC<FileListProps> = ({
     const [listHeight, setListHeight] = useState('auto');
     const containerRef = useRef<HTMLDivElement>(null);
 
+    useEffect(() => {
+        const updateHeight = () => {
+            if (containerRef.current) {
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+                setListHeight(`calc(var(--vh, 1vh) * 100 - 300px)`);
+            }
+        };
+
+        updateHeight();
+        window.addEventListener('resize', updateHeight);
+
+        return () => window.removeEventListener('resize', updateHeight);
+    }, []);
+
     const getIconForFileType = (name: string) => {
         const fileExt = name.split('.').pop()?.toLowerCase();
         switch (fileExt) {
@@ -94,10 +109,14 @@ const FileList: React.FC<FileListProps> = ({
             className={`flex flex-col w-full h-full justify-center items-center p-2 rounded-xl ${
                 selectedFiles.length > 0 ? 'bg-card' : ''
             }`}
+            style={{ height: listHeight }}
         >
             {selectedFiles.length > 0 ? (
                 <>
-                    <CardContent className="p-2 text-center w-full flex flex-col border border-gray-500 rounded-xl max-h-[calc(100vh-370px)] min-h-[calc(100vh-370px)]">
+                    <CardContent
+                        className="p-2 text-center w-full flex flex-col border border-gray-500 rounded-xl overflow-hidden"
+                        style={{ height: `calc(${listHeight} - 60px)` }}
+                    >
                         <div className="w-full h-full overflow-y-auto">
                             <ul className="space-y-2">
                                 {selectedFiles.map((file, index) => (
@@ -126,7 +145,7 @@ const FileList: React.FC<FileListProps> = ({
                         <Button
                             variant="ghost"
                             onClick={() => setSelectedFiles([])}
-                            className="opacity-80 bg-black font-bold border-primary border-2 "
+                            className="opacity-80 bg-black font-bold border-primary border-2"
                         >
                             Clear All Files
                         </Button>
