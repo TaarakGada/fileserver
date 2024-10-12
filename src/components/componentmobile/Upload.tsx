@@ -12,12 +12,12 @@ import { UploadCloud } from 'lucide-react';
 
 function Upload() {
     const [loading, setLoading] = useState(false);
-    const [uniqueCode, setUniqueCode] = useState<string>('');
+    const [uniqueCode, setUniqueCode] = useState<string>('ig11');
     const pb = new PocketBase('https://sujal.pockethost.io');
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [activeTab, setActiveTab] = useState('files');
     const [textInput, setTextInput] = useState('');
-    const [isUploaded, setIsUploaded] = useState(false);
+    const [isUploaded, setIsUploaded] = useState(true);
 
     const handleTabChange = (newTab: string) => {
         if (newTab !== activeTab) {

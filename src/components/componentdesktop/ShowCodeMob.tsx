@@ -1,5 +1,3 @@
-import { UploadCloudIcon } from 'lucide-react';
-import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import QRCode from './qrCode';
 import { redirect } from 'next/navigation';
@@ -25,7 +23,6 @@ function ShowCode({ unique }: { unique: string }) {
 
                 <CardContent className="px-4 py-0 flex flex-col flex-grow items-center justify-center w-full h-full">
                     <div className="text-xl text-gray-700 dark:text-gray-200 font-mono text-center">
-                        Sharing Code{' '}
                         <span className="text-primary">{unique}</span>
                     </div>
                     <div className="w-full flex items-center justify-center flex-grow">

@@ -35,15 +35,15 @@ export function Recieve({ code = '' }: RecieveProps) {
 
     useEffect(() => {
         if (
-            code &&
-            code.length === 4 &&
-            magicWordSchema.safeParse(code).success &&
+            magicWord &&
+            magicWord.length === 4 &&
+            magicWordSchema.safeParse(magicWord).success &&
             !hasAttemptedFetch
         ) {
-            const timer = setTimeout(() => fetchFiles(code), 200); // 200ms delay to ensure proper handling
+            const timer = setTimeout(() => fetchFiles(magicWord), 200); // 200ms delay to ensure proper handling
             return () => clearTimeout(timer); // Clean up timeout on unmount
         }
-    }, [code, hasAttemptedFetch]);
+    }, [magicWord, hasAttemptedFetch]);
 
     const handleKeyPress = useCallback(
         (event: KeyboardEvent) => {
@@ -268,6 +268,7 @@ export function Recieve({ code = '' }: RecieveProps) {
                                             setTextFileContent('');
                                             setCollectionId('');
                                             setMagicWord('');
+                                            code = '';
                                             setHasAttemptedFetch(false);
                                             router.push('/get');
                                         }}
@@ -293,6 +294,7 @@ export function Recieve({ code = '' }: RecieveProps) {
                                             setTextFileContent('');
                                             setCollectionId('');
                                             setMagicWord('');
+                                            code = '';
                                             setHasAttemptedFetch(false);
                                             router.push('/get');
                                         }}
