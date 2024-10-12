@@ -70,7 +70,7 @@ function Wrapper({ children }: { children: React.ReactNode }) {
                                 : 'text-white hover:text-primary hover:bg-gray-100/10 px-4'
                         )}
                     >
-                        Upload
+                        Send
                     </Link>
                     <Link
                         href="/get"
@@ -82,7 +82,7 @@ function Wrapper({ children }: { children: React.ReactNode }) {
                                 : 'text-white hover:text-primary hover:bg-gray-100/10 px-4'
                         )}
                     >
-                        Get
+                        Recieve
                     </Link>
                     {showInstallPrompt && (
                         <Button

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Input } from '../ui/input';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
@@ -13,6 +13,7 @@ import { Textarea } from '../ui/textarea';
 import { Card, CardContent, CardDescription } from '../ui/card';
 import Loader from '../ui/Loader';
 import { FileSearch } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface RecieveProps {
     code?: string;
@@ -30,6 +31,28 @@ export function Recieve({ code = '' }: RecieveProps) {
     const pb = new PocketBase('https://sujal.pockethost.io');
     const [fetchedCode, setFetchedCode] = useState<string>('');
     const [fileLinks, setFileLinks] = useState<string[]>([]);
+    const router = useRouter();
+
+    useEffect(() => {
+        if (
+            code &&
+            code.length === 4 &&
+            magicWordSchema.safeParse(code).success &&
+            !hasAttemptedFetch
+        ) {
+            const timer = setTimeout(() => fetchFiles(code), 200); // 200ms delay to ensure proper handling
+            return () => clearTimeout(timer); // Clean up timeout on unmount
+        }
+    }, [code, hasAttemptedFetch]);
+
+    const handleKeyPress = useCallback(
+        (event: KeyboardEvent) => {
+            if (event.key === 'Enter') {
+                handleFetchFiles();
+            }
+        },
+        [magicWord]
+    );
 
     const magicWordSchema = z
         .string()
@@ -242,9 +265,11 @@ export function Recieve({ code = '' }: RecieveProps) {
                                     <Button
                                         onClick={() => {
                                             setFileLinks([]);
+                                            setTextFileContent('');
                                             setCollectionId('');
                                             setMagicWord('');
                                             setHasAttemptedFetch(false);
+                                            router.push('/get');
                                         }}
                                         className="bg-primary text-black font-semibold h-12 rounded-lg text-lg"
                                     >
@@ -265,9 +290,11 @@ export function Recieve({ code = '' }: RecieveProps) {
                                     <Button
                                         onClick={() => {
                                             setFileLinks([]);
+                                            setTextFileContent('');
                                             setCollectionId('');
                                             setMagicWord('');
                                             setHasAttemptedFetch(false);
+                                            router.push('/get');
                                         }}
                                         className="bg-primary text-black font-semibold h-12 rounded-lg text-lg"
                                     >

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     Card,
     CardContent,
@@ -9,7 +9,7 @@ import {
 import { FileSearch2, Link, UploadCloudIcon } from 'lucide-react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
-import { z } from 'zod';
+import { set, z } from 'zod';
 import toast from 'react-hot-toast';
 import PocketBase from 'pocketbase';
 import Loader from '../ui/Loader';
@@ -80,12 +80,15 @@ const RevisedFileGet: React.FC<FileViewProps> = ({
             } else {
                 setTextFileContent('');
             }
+            setMagicWord('');
+            setHasAttemptedFetch(false);
         } catch (error: any) {
             if (error.toString().includes('ClientResponseError')) {
                 toast.error('No files associated to this code!');
                 setFileLinks([]);
                 setCollectionId('');
                 setMagicWord('');
+                setHasAttemptedFetch(false);
             } else {
                 toast.error('Error: ' + error?.toString());
             }
@@ -93,6 +96,27 @@ const RevisedFileGet: React.FC<FileViewProps> = ({
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (
+            magicWord &&
+            magicWord.length === 4 &&
+            magicWordSchema.safeParse(magicWord).success &&
+            !hasAttemptedFetch
+        ) {
+            const timer = setTimeout(() => fetchFiles(magicWord), 200); // 200ms delay to ensure proper handling
+            return () => clearTimeout(timer); // Clean up timeout on unmount
+        }
+    }, [magicWord, hasAttemptedFetch]);
+
+    const handleKeyPress = useCallback(
+        (event: KeyboardEvent) => {
+            if (event.key === 'Enter') {
+                handleFetchFiles();
+            }
+        },
+        [magicWord]
+    );
 
     const handleFetchFiles = () => {
         if (magicWord.length <= 0) {

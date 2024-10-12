@@ -60,7 +60,7 @@ export default function GetFiles({ params }: { params: { id: string } }) {
                         {isShowCode ? (
                             <ShowCodeMob unique={uniqueId} />
                         ) : (
-                            <Recieve />
+                            <Recieve code={uniqueId} />
                         )}
                     </main>
                     <Navbar />
