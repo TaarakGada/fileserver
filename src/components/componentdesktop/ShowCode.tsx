@@ -31,7 +31,7 @@ function ShowCode({
                         </span>
                     </div>
                     <div className="w-full flex items-center justify-center flex-grow">
-                        <QRCode url={`https://fs.sujal.xyz/${unique}`} />
+                        <QRCode url={`https://fileshare.sujal.xyz/${unique}`} />
                     </div>
                 </CardContent>
                 <CardContent className="p-0 w-full">

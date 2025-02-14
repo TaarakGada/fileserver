@@ -64,7 +64,7 @@ function RevisedUpload() {
         try {
             let newUnique;
             do {
-                newUnique = generateUniqueCode();
+                newUnique = generateUniqueCode().toLowerCase();
             } while (
                 await pb
                     .collection('files')
@@ -83,7 +83,7 @@ function RevisedUpload() {
                 formData.append('file', textFile);
             }
 
-            formData.append('unique', newUnique);
+            formData.append('unique', newUnique.toLowerCase());
 
             await pb.collection('files').create(formData);
             toast.success('Uploaded Successfully');
